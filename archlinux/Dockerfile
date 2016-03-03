@@ -1,25 +1,3 @@
-#!/usr/bin/env bash
-
-prepare_sudo () {
-    echo "Will now call:  sudo"
-    echo "Please supply a password to sudo (if it is no longer cached)"
-    sudo echo -n "temporarily working as " && sudo whoami    || exit 1               ## fail is sudo did not work
-}
-
-
-
-
-mkdir -p ~/docker_dir
-cd       ~/docker_dir
-
-prepare_sudo
-sudo apt-get install docker.io
-sudo docker pull greyltc/archlinux
-
-mkdir -p archlinux
-cd       archlinux
-
-cat <<EOF    > Dockerfile
 FROM    greyltc/archlinux
 
 ## uncomment the following if you're behind a proxy
@@ -30,7 +8,7 @@ FROM    greyltc/archlinux
 ## use the following mirror in /etc/pacman.d/mirrorlist
 ## ==>  http://mirror.rackspace.com/archlinux/$repo/os/$arch
 RUN     mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.prev
-RUN     echo "Server = http://mirror.rackspace.com/archlinux/\\\$repo/os/\\\$arch" >  /etc/pacman.d/mirrorlist
+RUN     echo "Server = http://mirror.rackspace.com/archlinux/\$repo/os/\$arch" >  /etc/pacman.d/mirrorlist
 RUN     cat /etc/pacman.d/mirrorlist.pacnew                                    >> /etc/pacman.d/mirrorlist
 
 
@@ -67,7 +45,7 @@ RUN     echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 RUN     useradd -G sudo -ms /bin/bash user1
 
 ENV     HOME /home/user1
-#RUN     chown -R user1:user1 \$HOME
+#RUN     chown -R user1:user1 $HOME
 
 RUN     mkdir            /data_volume
 RUN     chown root:user1 /data_volume
@@ -75,15 +53,4 @@ RUN     chown root:user1 /data_volume
 
 USER    user1
 
-WORKDIR \$HOME
-
-
-EOF
-
-mkdir data_volume
-
-sudo docker build -t="my_archlinux" .
-sudo docker run --name arch1 -v $(readlink -e data_volume):/data_volume              -it my_archlinux sudo -u user1 /bin/bash -l
-
-#sudo docker run --name arch1 -v $(readlink -e data_volume):/data_volume --user user1 -it my_archlinux /bin/bash -l ## git submodule    brings error
-#sudo docker rm arch1
+WORKDIR $HOME
