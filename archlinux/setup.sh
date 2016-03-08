@@ -8,8 +8,8 @@ prepare_sudo () {
 
 prepare_sudo
 
-sudo apt-get install docker.io
-sudo docker pull greyltc/archlinux
+sudo -E apt-get install docker.io
+sudo -E docker pull greyltc/archlinux
 
 mkdir data_volume
 

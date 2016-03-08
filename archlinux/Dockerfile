@@ -1,8 +1,12 @@
 FROM    greyltc/archlinux
 
 ## uncomment the following if you're behind a proxy
-#  ENV     http_proxy  "http://ip_of_proxy:port"
-#  ENV     https_proxy "http://ip_of_proxy:port"
+#ENV     http_proxy  "http://proxy_ip:port"
+#ENV     https_proxy "http://proxy_ip:port"
+
+## uncomment the following if you're behind a proxy (setup pacman to use wget -> longer timeout periods)
+## ## install wget
+#RUN     pacman --noconfirm -S wget
 
 
 ## use the following mirror in /etc/pacman.d/mirrorlist
@@ -12,16 +16,19 @@ RUN     echo "Server = http://mirror.rackspace.com/archlinux/\$repo/os/\$arch" >
 RUN     cat /etc/pacman.d/mirrorlist.pacnew                                    >> /etc/pacman.d/mirrorlist
 
 
+## uncomment the following if you're behind a proxy (setup pacman to use wget -> longer timeout periods)
+## ## setup pacman to use wget (it has longer timeout periods, by default 900 seconds)
+## RUN     sed -i "s|^#XferCommand = .*wget.*$|XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u|" /etc/pacman.conf
 
 ## uncomment the following if you're behind a proxy (setup pacman to use wget -> longer timeout periods)
-#  ## install wget
-#  RUN     pacman --noconfirm -S wget
-#  ## setup pacman to use wget (it has longer timeout periods, by default 900 seconds)
-#  RUN     sed -i "s|^#XferCommand = .*wget.*$|XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u|" /etc/pacman.conf
+## RUN     echo "#!/usr/bin/env bash"              > /etc/profile.d/proxy.sh && \
+##         echo ""                                >> /etc/profile.d/proxy.sh && \
+##         echo "export http_proxy=$http_proxy"   >> /etc/profile.d/proxy.sh && \
+##         echo "export https_proxy=$https_proxy" >> /etc/profile.d/proxy.sh
 
 
 ## update
-RUN     pacman -Syu
+RUN     pacman --noconfirm -Syu
 
 ## download base-devel
 RUN     pacman --noconfirm --needed -S base-devel
